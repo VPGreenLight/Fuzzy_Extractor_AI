@@ -34,9 +34,9 @@ FINGERPRINT_FEATURE_DIM = 512   # Số chiều vector đặc trưng vân tay
 # ==============================================================================
 QUANTIZED_BITS = 128             # Số bit nhị phân sau lượng tử hóa (16 bytes)
 BCH_M = 8                        # Trường Galois GF(2^8)
-BCH_ERROR_CORRECTION_BITS = 10   # Khả năng sửa lỗi tối đa t = 10 bits
-BCH_DATA_BYTES = 6               # Độ dài bí mật R: 6 bytes (48 bits)
-BCH_ECC_BYTES = 10               # Độ dài ECC: 10 bytes (80 bits) -> Tổng: 16 bytes = 128 bits
+BCH_ERROR_CORRECTION_BITS = 12   # Khả năng sửa lỗi tối đa t = 12 bits (~10% theo demo.pdf)
+BCH_DATA_BYTES = 4               # Độ dài bí mật R: 4 bytes (32 bits)
+BCH_ECC_BYTES = 12               # Độ dài ECC: 12 bytes (96 bits) -> Tổng: 16 bytes = 128 bits
 
 # ==============================================================================
 # 3. CẤU HÌNH MẬT MÃ HỌC (HKDF & AES-256-GCM)
