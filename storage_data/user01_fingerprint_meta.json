@@ -1,0 +1,9 @@
+{
+    "profile_id": "user01",
+    "modality": "fingerprint",
+    "iv": "DnqOdMbplTXEhauJ",
+    "tag": "nZLetaYUCbPkjp8WL1BTxQ==",
+    "salt": "UFRJVF9JTlQxMzQ0X0JJT01FVFJJQ19TQUxUXzIwMjY=",
+    "info": "QUVTXzI1Nl9HQ01fRU5DUllQVElPTl9LRVk=",
+    "aad": null
+}

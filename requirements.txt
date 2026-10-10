@@ -1,0 +1,9 @@
+# Danh sách thư viện phụ thuộc cho đề tài Fuzzy Extractor & AI (PTIT)
+torch>=2.0.0
+torchvision>=0.15.0
+facenet-pytorch>=2.5.3
+opencv-python>=4.8.0
+Pillow>=9.5.0
+numpy>=1.24.0
+cryptography>=41.0.0
+bchlib>=0.14.0; sys_platform != "win32" or python_version < "3.12"
