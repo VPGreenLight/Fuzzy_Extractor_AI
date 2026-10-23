@@ -7,7 +7,7 @@ Nhiệm vụ:
 import config
 
 try:
-    import bchlib
+    import bchlib  # type: ignore[import-untyped]
     HAS_BCHLIB = True
 except ImportError:
     HAS_BCHLIB = False

@@ -1,4 +1,4 @@
-# Danh sách thư viện phụ thuộc cho đề tài Fuzzy Extractor & AI (PTIT)
+# Dependencies for Fuzzy Extractor AI (PTIT)
 torch>=2.0.0
 torchvision>=0.15.0
 facenet-pytorch>=2.5.3
