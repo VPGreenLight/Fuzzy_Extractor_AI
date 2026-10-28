@@ -31,9 +31,12 @@ from storage.metadata import MetadataStorage
 import config
 
 
-def get_biometric_bits(image_path: str, modality: str = "face") -> tuple:
+def get_biometric_bits(image_path: str, modality: str = "face",
+                       reliable_indices=None) -> tuple:
     """
     Quy trình Tiền xử lý -> Trích xuất AI -> Lượng tử hóa thành chuỗi bit
+    - Nếu reliable_indices=None (giai đoạn đăng ký): Tự động chọn lọc 128 chiều ổn định nhất.
+    - Nếu có reliable_indices (giai đoạn tái tạo): Lượng tử hóa theo đúng các chiều trong Helper Data.
     """
     quantizer = Quantizer(target_bits=config.QUANTIZED_BITS)
 
@@ -54,9 +57,12 @@ def get_biometric_bits(image_path: str, modality: str = "face") -> tuple:
     else:
         raise ValueError(f"Loại sinh trắc học không hỗ trợ: {modality}")
 
+    if reliable_indices is None:
+        reliable_indices = quantizer.select_reliable_indices(embedding)
+
     print(f"  [1.3] Lượng tử hóa vector thành chuỗi bit nhị phân {config.QUANTIZED_BITS}-bit...")
-    w = quantizer.quantize(embedding)
-    return w, embedding
+    w = quantizer.quantize(embedding, reliable_indices=reliable_indices)
+    return w, embedding, reliable_indices
 
 
 def enroll(profile_id: str, image_path: str, file_to_encrypt: str, modality: str = "face"):
@@ -69,12 +75,12 @@ def enroll(profile_id: str, image_path: str, file_to_encrypt: str, modality: str
 
     # 1. Thu thập và lượng tử hóa đặc trưng sinh trắc học
     print("\n[Bước 1] Thu thập và lượng tử hóa sinh trắc học:")
-    w, _ = get_biometric_bits(image_path, modality)
+    w, _, reliable_indices = get_biometric_bits(image_path, modality)
 
     # 2. Sinh bí mật R và Helper Data P qua Fuzzy Extractor Gen
     print("\n[Bước 2] Thực thi thuật toán Fuzzy Extractor Gen(w):")
     fuzzy = FuzzyExtractor()
-    secret_R, helper_data = fuzzy.gen(w)
+    secret_R, helper_data = fuzzy.gen(w, reliable_indices=reliable_indices)
     print(f"  -> Sinh bí mật ngẫu nhiên R: {len(secret_R)} bytes")
     print(f"  -> Tính Helper Data P (bảo vệ bằng mã sửa lỗi BCH, t={config.BCH_ERROR_CORRECTION_BITS})")
 
@@ -112,13 +118,15 @@ def decrypt(profile_id: str, new_image_path: str, output_decrypted_file: str, mo
     print(f"  BẮT ĐẦU QUY TRÌNH TÁI TẠO KHÓA & GIẢI MÃ (Hồ sơ: {profile_id} - Nhánh: {modality})")
     print(f"==================================================================")
 
-    # 1. Thu thập mẫu sinh trắc học mới
-    print("\n[Bước 1] Thu thập mẫu sinh trắc học xác thực mới:")
-    w_prime, _ = get_biometric_bits(new_image_path, modality)
-
-    # 2. Tải Helper Data P
-    print("\n[Bước 2] Tải Helper Data P từ storage:")
+    # 1. Tải Helper Data P trước để lấy cấu hình các chiều lượng tử hóa ổn định (nếu có)
     helper_data = HelperDataStorage.load(profile_id, modality)
+    reliable_indices = helper_data.get("reliable_indices", None)
+
+    # 2. Thu thập mẫu sinh trắc học mới
+    print("\n[Bước 1] Thu thập mẫu sinh trắc học xác thực mới:")
+    w_prime, _, _ = get_biometric_bits(new_image_path, modality, reliable_indices=reliable_indices)
+
+    print("\n[Bước 2] Tải Helper Data P từ storage:")
     print(f"  -> Tải thành công Helper Data cho hồ sơ '{profile_id}'")
 
     # 3. Tái tạo bí mật R bằng Fuzzy Extractor Rep (sửa lỗi BCH)

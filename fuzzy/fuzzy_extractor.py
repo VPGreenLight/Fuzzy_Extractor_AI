@@ -18,10 +18,12 @@ class FuzzyExtractor:
         self.ecc = ErrorCorrectingCode()
         self.bits_len = config.QUANTIZED_BITS
 
-    def gen(self, w: np.ndarray) -> tuple[bytes, dict]:
+    def gen(self, w: np.ndarray, reliable_indices: np.ndarray = None) -> tuple[bytes, dict]:
         """
         Hàm khởi tạo (Generate - Gen):
-        - Input: Chuỗi bit sinh trắc học w độ dài config.QUANTIZED_BITS
+        - Input:
+            + w: Chuỗi bit sinh trắc học độ dài config.QUANTIZED_BITS
+            + reliable_indices: Chỉ số các chiều đặc trưng ổn định được chọn khi lượng tử hóa (nếu có)
         - Output:
             + secret_R: Chuỗi bí mật ngẫu nhiên R (bytes)
             + helper_data: Dữ liệu phụ trợ Helper Data P (dict) để lưu trữ công khai
@@ -48,6 +50,8 @@ class FuzzyExtractor:
             "data_len": self.ecc.data_len,
             "ecc_len": self.ecc.ecc_len
         }
+        if reliable_indices is not None:
+            helper_data["reliable_indices"] = np.asarray(reliable_indices, dtype=np.int32).tolist()
 
         return secret_R, helper_data
 

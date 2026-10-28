@@ -80,10 +80,11 @@ def verify_face_module():
     sim_diff = extractor.cosine_similarity(emb_a1, emb_b1)
     is_diff = extractor.is_same_person(emb_a1, emb_b1)
 
-    # 4. Đo khoảng cách Hamming sau bước lượng tử hóa (Không gian nhị phân)
-    bits_a1 = quantizer.quantize(emb_a1)
-    bits_a2 = quantizer.quantize(emb_a2)
-    bits_b1 = quantizer.quantize(emb_b1)
+    # 4. Đo khoảng cách Hamming sau bước lượng tử hóa chọn lọc chiều ổn định (Không gian nhị phân)
+    rel_idx = quantizer.select_reliable_indices(emb_a1)
+    bits_a1 = quantizer.quantize(emb_a1, reliable_indices=rel_idx)
+    bits_a2 = quantizer.quantize(emb_a2, reliable_indices=rel_idx)
+    bits_b1 = quantizer.quantize(emb_b1, reliable_indices=rel_idx)
 
     hamming_same = quantizer.hamming_distance(bits_a1, bits_a2)
     hamming_diff = quantizer.hamming_distance(bits_a1, bits_b1)

@@ -60,9 +60,10 @@ def verify_fuzzy_module():
         emb_a2 = extractor.extract(preprocessor.process(img_a2))
         emb_b1 = extractor.extract(preprocessor.process(img_b1))
 
-        w_a1 = quantizer.quantize(emb_a1)
-        w_a2 = quantizer.quantize(emb_a2)
-        w_b1 = quantizer.quantize(emb_b1)
+        rel_idx = quantizer.select_reliable_indices(emb_a1)
+        w_a1 = quantizer.quantize(emb_a1, reliable_indices=rel_idx)
+        w_a2 = quantizer.quantize(emb_a2, reliable_indices=rel_idx)
+        w_b1 = quantizer.quantize(emb_b1, reliable_indices=rel_idx)
         print("  -> Đã trích xuất & lượng tử hóa thành công chuỗi 128 bit từ ảnh thật.")
     else:
         print("\n[*] Không tìm thấy đủ 3 ảnh mẫu, sử dụng vector sinh trắc học giả lập:")
